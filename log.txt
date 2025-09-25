@@ -1,0 +1,4 @@
+(venv) [leo ~/Documents/McGill University/2025 Fall/COMP551/Assignments/A1]$ python sgdlogistic.py --alpha 20 --split 40 --batch 10
+Results for a 40/60 train/test split and batch size 22 with learning rate 20:
+305/342 correct classifications (89.18% accuracy)
+
