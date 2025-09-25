@@ -88,7 +88,7 @@ def R2(y,yh):
     ss_tot = np.sum((y-y_mean)**2)
     return 1 - ss_res / ss_tot
 
-print(f'Results for a {args.split}/{100-args.split} train/test split with learning rate {args.alpha}:')
+print(f'Results for a {args.split}/{100-args.split} train/test split:')
 print(f"MSE: {mse_np}")
 print(f"RMSE: {rmse_np}")
 print(f"R^2: {R2(Y_predict, yh)}")
