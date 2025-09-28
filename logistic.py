@@ -77,19 +77,6 @@ Y['Diagnosis'] = Y['Diagnosis'].map(diagnosis_map)
 
 #get correlation matrix
 corr = abs(X.corr())
-
-#plot correlation matrix
-plt.figure(figsize=(8,6))
-sns.heatmap(corr, #plot heatmap for correlation matrix of mean variables for this dataset     
-            annot=True, 
-            cmap="coolwarm", 
-            fmt=".2f", 
-            linewidths=0.5, 
-            #xticklabels= ['Diagnosis', 'Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 'Compactness', "Concavity", "Concave Points", "Symmetry", "Fractal Dimension" ], 
-            #yticklabels= ['Diagnosis', 'Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 'Compactness', "Concavity", "Concave Points", "Symmetry", "Fractal Dimension" ]
-            )
-plt.show()
-
 #get upper triangular matrix
 upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
 # find features with correlation greater than 0.9 with each other 
@@ -224,14 +211,4 @@ plt.ylabel('Classification')
 plt.title('Logistic Regression Breast Cancer Classification')
 plt.show()
 
-#this is Laurel working on the graph of performance by split, not done yet
-splits = [0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.15, 0.1, 0.05]
-#ex1 = test_logistic_regression(X, Y, splits)
-#plt.errorbar(splits, ex1[0][0], yerr=ex1[0][1])
-##plt.plot(splits, ex1[0][0], label= "PCT Correct of Training Data")
-#plt.errorbar(splits, ex1[1][0], yerr=ex1[1][1])
-#plt.plot(splits, ex1[1][0], label="PCT Correct of Testing Data")
-#plt.legend(loc="upper right")
-#plt.xlabel("Training Split")
-#plt.ylabel("PCT Correctly Categorized")
-#plt.show()
+

@@ -37,16 +37,6 @@ Y = df[['motor_UPDRS']] #Target
 
 #get correlation matrix
 corr = abs(X.corr())
-
-plt.figure(figsize=(8,6))
-sns.heatmap(X.corr(), #plot heatmap for correlation matrix of mean variables for this dataset     
-            annot=True, 
-            cmap="coolwarm", 
-            fmt=".2f", 
-            linewidths=0.5, 
-            )
-plt.show()
-
 #get upper triangular matrix
 upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
 # find features with correlation greater than 0.9 with each other 
