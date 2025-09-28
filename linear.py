@@ -51,13 +51,6 @@ outlier_indices = np.where(z > 3)[0]
 X = X.drop(outlier_indices)
 Y = Y.drop(outlier_indices)
 
-# variable information
-#print(X[X.eq('?').any(axis=1)])
-#print(X.info())
-#print(X.describe())
-#print(Y.info())
-#print(Y.describe())
-
 class LinearRegression:
     def __init__(self, add_bias=True):
         self.add_bias = add_bias
@@ -85,11 +78,6 @@ X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
 Y_predict = Y.iloc[train_range:]
-
-#Scale Features
-#scaler = StandardScaler()
-#X_train = scaler.fit_transform(X_train)
-#X_predict = scaler.transform(X_predict)
 
 #Fit and Predict
 model = LinearRegression()
