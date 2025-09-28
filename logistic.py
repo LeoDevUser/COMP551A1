@@ -156,31 +156,6 @@ def logistic_success_rate(y_predicted, y):
     error = abs(yp-y) #if 0 then it was correctly predicted
     return round((N-error.sum())/N*100, 2)
 
-def test_logistic_regression(x, y, testsplits): 
-    train_pts = []
-    test_pts = []
-    for split in testsplits:
-        for i in range(10):
-            X_train, X_test, y_train, y_test = train_test_split(x, y, train_size=split)
-            model = LogisticRegression().fit(X_train, y_train)
-            test = model.predict(X_test)
-            performance = model.predict(X_train)               
-            error_train = logistic_success_rate(performance, y_train)
-            error_test =logistic_success_rate(test, y_test)
-            train_pts.append([split, error_train])
-            test_pts.append([split, error_test])
-    print(train)
-    train_error = []
-    test_error = []
-    for split in testsplits:
-        train_avg = sum(train[split])/10
-        train_SE = stats.sem(train[split])
-        train_error.append([train_avg, train_SE])
-        test_avg = sum(test[split])/10
-        test_SE = stats.sem(test[split])
-        test_error.append([test_avg, test_SE])
-    return [train_error, test_error]
-
 #train model
 #Split Data
 train_range = int(args.split / 100 * len(X)) #lenX is number of instances
