@@ -6,6 +6,7 @@ from ucimlrepo import fetch_ucirepo
 from scipy.special import expit as logistic
 import argparse
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
+from scipy import stats
 
 #parse arguments
 batch_size = 0
@@ -59,6 +60,21 @@ diagnosis_map = {'M' : 1, 'B' : 0}
 Y['Diagnosis'] = Y['Diagnosis'].map(diagnosis_map)
 
 #logistic = lambda z : 1. / (1 + np.exp(-z))
+
+corr = abs(X.corr())
+#get upper triangular matrix
+upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
+# find features with correlation greater than 0.9 with each other 
+to_drop = [column for column in upper.columns if any(upper[column] > 0.9)]
+# drop highly correlated features
+X = X.drop(to_drop, axis=1)
+
+#drop outliers with z score greater than 3 
+z = np.abs(stats.zscore(X))
+#~0.2% (0.1 above and 0.1 below the mean) of data in a normally distributed dataset will fall in this range
+outlier_indices = np.where(z > 3)[0]
+X = X.drop(outlier_indices)
+Y = Y.drop(outlier_indices)
 
 class LogisticRegression:
     def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5, verbose=False):
