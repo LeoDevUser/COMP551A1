@@ -9,9 +9,9 @@ import seaborn as sns
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 from scipy import stats
 
-batch_size = 0#init batch size
-
 #parse arguments
+batch_size = 0
+
 def check_int(value):
     try:
         ivalue = int(value)
@@ -23,11 +23,11 @@ def check_int(value):
     
     return ivalue
 #create parser
-parser = argparse.ArgumentParser(usage='logistic.py [--split|--batch|--alpha] [values]')
+parser = argparse.ArgumentParser(usage='sgdlinear.py [--split|--batch|--alpha] [values]')
 #add args
 parser.add_argument('--split', type=check_int, help='represents the fraction used as the training set', default=80)
-parser.add_argument('--batch', type=check_int, help='represents the fraction of the training set that is to be batched', default=100)
 parser.add_argument('--alpha', type=int, help='The learning rate', default=10)
+parser.add_argument('--batch', type=check_int, help='Represents the fraction of the training set that is to be batched', default=50)
 args = parser.parse_args()
 if args.split == 100:
     args.split = 99
@@ -53,34 +53,18 @@ pd.set_option('display.max_columns', None)
 #Y = breast_cancer_wisconsin_diagnostic.data.targets.copy()
 X = breast_cancer_wisconsin_diagnostic.drop(columns =['Diagnosis', 'ID']) #features
 X = X.drop(X.iloc[:, 10:20], axis=1) #drop standard error features
-Y = breast_cancer_wisconsin_diagnostic[['Diagnosis']] #target
+Y = breast_cancer_wisconsin_diagnostic[['Diagnosis']].copy() #target
 
-# metadata
-#print(breast_cancer_wisconsin_diagnostic.metadata)
+# Convert string labels to numeric: 'M' (malignant) = 1, 'B' (benign) = 0
+Y['Diagnosis'] = Y['Diagnosis'].map({'M': 1, 'B': 0})
 
-# variable information
-#print(breast_cancer_wisconsin_diagnostic.variables)
-
-
-# variable information
-#print(X[X.eq('?').any(axis=1)])
-#print(X.info())
-#print(X.describe())
-#print(Y.info())
-#print(Y.describe())
-
-#Turn M and B into binary values
-diagnosis_map = {'M' : 1, 'B' : 0}
-Y['Diagnosis'] = Y['Diagnosis'].map(diagnosis_map)
-
-#logistic = lambda z : 1. / (1 + np.exp(-z))
 #get correlation matrix
 corr = abs(X.corr())
 #get upper triangular matrix
 upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
-# find features with correlation greater than 0.9 with each other 
+#find features with correlation greater than 0.9 with each other 
 to_drop = [column for column in upper.columns if any(upper[column] > 0.9)]
-# drop highly correlated features
+#drop highly correlated features
 X = X.drop(to_drop, axis=1)
 
 #drop outliers with z score greater than 3 
@@ -89,6 +73,13 @@ z = np.abs(stats.zscore(X))
 outlier_indices = np.where(z > 3)[0]
 X = X.drop(outlier_indices)
 Y = Y.drop(outlier_indices)
+
+wdbc_bar = plt.bar(['Benign = 0', 'Malignant = 1'], Y.value_counts(), color=['tab:red', 'tab:blue']) #bar chart of diagnosis
+plt.title('Malignant vs Benign Tumors in the Dataset After Preprocessing')
+plt.xlabel('Diagnosis')
+plt.bar_label(wdbc_bar, labels=Y.value_counts(), label_type='center')
+plt.ylabel('Count')
+plt.show()
 
 class LogisticRegression:
     def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5, verbose=False):
@@ -146,32 +137,35 @@ class LogisticRegression:
         grad = np.dot(x.T, yh - y) / N
         return grad
 
-#train model
-#Split Data
-train_range = int(args.split / 100 * len(X)) #569 is the number of instances
-X_train = X.iloc[:train_range]
-X_predict = X.iloc[train_range:]
-Y_train = Y.iloc[:train_range]
-Y_predict = Y.iloc[train_range:]
+#calculate what % of points are correctly categorized (eg. y_predicted>0.5 vs. y_predicted<0.5)
+def logistic_success_rate(y_predicted, y):
+    N = len(y_predicted)
+    y = np.array(y)
+    yp = y_predicted.round() #round to either 0 or 1 
+    error = abs(yp-y) #if 0 then it was correctly predicted
+    return round((N-error.sum())/N*100, 2)
 
-#Scale Features
-#scaler = StandardScaler()
-#X_train = scaler.fit_transform(X_train)
-#X_predict = scaler.transform(X_predict)
+def test_logistic_regression(x, y, split_percent, learning_rate): 
+    train_range = int(len(x) * split_percent / 100)
+    
+    # Split data manually
+    X_train = x.iloc[:train_range]
+    X_test = x.iloc[train_range:]
+    y_train = y.iloc[:train_range]
+    y_test = y.iloc[train_range:]
+    
+    model = LogisticRegression(learning_rate=learning_rate).fit(X_train, y_train)
+    yh = model.predict(X_test)
+    y = y_test['Diagnosis'].to_numpy()
 
-#Fit and Predict
-model = LogisticRegression(learning_rate=args.alpha)
-yh = model.fit(X_train,Y_train).predict(X_predict)
+    matching = (yh.round() == y).sum() #Number of correct classifications
+    test_total = len(y_test)
+    
+    # Print results (only test data)
+    print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
+    print(f'{matching}/{test_total} correct classifications ({round(matching * 100 / test_total, 2)}% accuracy)')
+    
+    return matching, test_total
 
-train = len(X) - train_range
-y = Y_predict['Diagnosis'].to_numpy()
-matching = (yh == y).sum() #Number of correct classifications
-print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
-print(f'{matching}/{train} correct classifications ({round(matching * 100 / train,2)}% accuracy)')
-x_plot = np.linspace(0,train-1, train)
-plt.plot(x_plot,yh,'r.')
-plt.plot(x_plot, Y_predict, '.')
-plt.xlabel('Instance')
-plt.ylabel('Classification')
-plt.title('Logistic Regression Breast Cancer Classification')
-plt.show()
+#run the test using command line arguments
+test_logistic_regression(X, Y, args.split, args.alpha)
