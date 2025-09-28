@@ -5,7 +5,9 @@ import pandas as pd
 from ucimlrepo import fetch_ucirepo
 from scipy.special import expit as logistic
 import argparse
+import seaborn as sns
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
+from scipy import stats
 
 batch_size = 0#init batch size
 
@@ -33,13 +35,25 @@ if args.alpha == 0:
     args.alpha = 1
 args.alpha = abs(args.alpha)
 
+#set headers
+wdbcHeaders = ["ID", "Diagnosis"]
+features = ["radius", "texture", "perimeter", "area", "smoothness", "compactness", "concavity", "concave_points", "symmetry", "fractal_dimension"]
+for i in range(len(features)):
+    wdbcHeaders.insert(i+2, features[i]+"1") #average value of the feature
+    wdbcHeaders.insert(2*i+3, features[i]+"2") #standard error of the feature
+    wdbcHeaders.insert(2*i+4, features[i]+"3") #worst/largest of the feature
+
 # fetch dataset
-breast_cancer_wisconsin_diagnostic = fetch_ucirepo(id=17)
+#breast_cancer_wisconsin_diagnostic = fetch_ucirepo(id=17)
+breast_cancer_wisconsin_diagnostic = pd.read_csv('wdbc_diagnosis.csv', header=None, names=wdbcHeaders)
 pd.set_option('display.max_columns', None)
 
 # data (as pandas dataframes)
-X = breast_cancer_wisconsin_diagnostic.data.features
-Y = breast_cancer_wisconsin_diagnostic.data.targets.copy()
+#X = breast_cancer_wisconsin_diagnostic.data.features
+#Y = breast_cancer_wisconsin_diagnostic.data.targets.copy()
+X = breast_cancer_wisconsin_diagnostic.drop(columns =['Diagnosis', 'ID']) #features
+X = X.drop(X.iloc[:, 10:20], axis=1) #drop standard error features
+Y = breast_cancer_wisconsin_diagnostic[['Diagnosis']] #target
 
 # metadata
 #print(breast_cancer_wisconsin_diagnostic.metadata)
@@ -60,6 +74,21 @@ diagnosis_map = {'M' : 1, 'B' : 0}
 Y['Diagnosis'] = Y['Diagnosis'].map(diagnosis_map)
 
 #logistic = lambda z : 1. / (1 + np.exp(-z))
+#get correlation matrix
+corr = abs(X.corr())
+#get upper triangular matrix
+upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
+# find features with correlation greater than 0.9 with each other 
+to_drop = [column for column in upper.columns if any(upper[column] > 0.9)]
+# drop highly correlated features
+X = X.drop(to_drop, axis=1)
+
+#drop outliers with z score greater than 3 
+z = np.abs(stats.zscore(X))
+#~0.2% (0.1 above and 0.1 below the mean) of data in a normally distributed dataset will fall in this range
+outlier_indices = np.where(z > 3)[0]
+X = X.drop(outlier_indices)
+Y = Y.drop(outlier_indices)
 
 class LogisticRegression:
     def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5, verbose=False):
@@ -119,7 +148,7 @@ class LogisticRegression:
 
 #train model
 #Split Data
-train_range = int(args.split / 100 * 569) #569 is the number of instances
+train_range = int(args.split / 100 * len(X)) #569 is the number of instances
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
@@ -134,7 +163,7 @@ Y_predict = Y.iloc[train_range:]
 model = LogisticRegression(learning_rate=args.alpha)
 yh = model.fit(X_train,Y_train).predict(X_predict)
 
-train = 569 - train_range
+train = len(X) - train_range
 y = Y_predict['Diagnosis'].to_numpy()
 matching = (yh == y).sum() #Number of correct classifications
 print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')

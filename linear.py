@@ -3,6 +3,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+import seaborn as sns
+from scipy import stats
 #from sklearn.preprocessing import StandardScaler
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 
@@ -32,6 +34,32 @@ pd.set_option('display.max_columns', None)
 # data (as pandas dataframes)
 X = df.drop(columns=['motor_UPDRS', 'subject#']) #Features
 Y = df[['motor_UPDRS']] #Target
+
+#get correlation matrix
+corr = abs(X.corr())
+
+plt.figure(figsize=(8,6))
+sns.heatmap(X.corr(), #plot heatmap for correlation matrix of mean variables for this dataset     
+            annot=True, 
+            cmap="coolwarm", 
+            fmt=".2f", 
+            linewidths=0.5, 
+            )
+plt.show()
+
+#get upper triangular matrix
+upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
+# find features with correlation greater than 0.9 with each other 
+to_drop = [column for column in upper.columns if any(upper[column] > 0.9)]
+# drop highly correlated features
+X = X.drop(to_drop, axis=1)
+
+#drop outliers with z score greater than 3 
+z = np.abs(stats.zscore(X))
+#~0.2% (0.1 above and 0.1 below the mean) of data in a normally distributed dataset will fall in this range
+outlier_indices = np.where(z > 3)[0]
+X = X.drop(outlier_indices)
+Y = Y.drop(outlier_indices)
 
 # variable information
 #print(X[X.eq('?').any(axis=1)])
