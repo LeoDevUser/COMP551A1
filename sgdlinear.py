@@ -134,7 +134,9 @@ def R2(y,yh):
     return 1 - ss_res / ss_tot
 
 print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
-print(f'The weight found: {model.w}')
+print(f'\nFeature names and their corresponding weights:')
+for i, col in enumerate(X.columns):
+    print(f"{col}: {model.w[i]}")
 print('\nResults for train set:')
 print(f"MSE: {mse_train}")
 print(f"RMSE: {rmse_train}")

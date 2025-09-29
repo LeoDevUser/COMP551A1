@@ -6,6 +6,7 @@ from scipy.special import expit as logistic
 import argparse
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 from scipy import stats
+from sklearn.preprocessing import StandardScaler
 
 #parse arguments
 batch_size = 0
@@ -104,7 +105,11 @@ class LogisticRegression:
 
         if self.verbose:
             #print(f'terminated after {t} iterations, with norm of the gradient equal to {np.linalg.norm(g)}')
-            print(f'The weight found: {self.w}')
+            print(f'\nFeature names and their corresponding weights:')
+            for i, col in enumerate(X.columns):
+                print(f"{col}: {self.w[i]}")
+            print('\n')
+
         return self
 
     def predict(self,x):
@@ -127,11 +132,16 @@ class LogisticRegression:
 def test_logistic_regression(x, y, split_percent, learning_rate): 
     train_range = int(len(x) * split_percent / 100)
     
-    # Split data manually
+    #Split data
     X_train = x.iloc[:train_range]
     X_test = x.iloc[train_range:]
     y_train = y.iloc[:train_range]
     y_test = y.iloc[train_range:]
+
+    #Scale Features
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
     
     model = LogisticRegression(learning_rate=learning_rate).fit(X_train, y_train)
     yh_test = model.predict(X_test)

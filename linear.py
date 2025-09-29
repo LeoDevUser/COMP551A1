@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 from scipy import stats
+from sklearn.preprocessing import StandardScaler
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 
 #parse arguments
@@ -77,6 +78,11 @@ X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
 Y_predict = Y.iloc[train_range:]
 
+#Scale Features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_predict = scaler.transform(X_predict)
+
 #Fit and Predict
 model = LinearRegression().fit(X_train,Y_train)
 yh_train = model.predict(X_train)
@@ -96,7 +102,9 @@ def R2(y,yh):
     return 1 - ss_res / ss_tot
 
 print(f'Results for a {args.split}/{100-args.split} train/test split:')
-print(f'The weight found: {model.w}')
+print(f'\nFeature names and their corresponding weights:')
+for i, col in enumerate(X.columns):
+    print(f"{col}: {model.w[i][0]}")
 print('\nResults for train set:')
 print(f"MSE: {mse_train}")
 print(f"RMSE: {rmse_train}")
