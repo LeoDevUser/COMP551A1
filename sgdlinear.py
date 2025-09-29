@@ -104,7 +104,7 @@ class LinearRegression:
         return grad
 
 #Split Data
-train_range = int(args.split / 100 * 5875) #5875 is the number of instances
+train_range = int(args.split / 100 * len(X)) #5875 is the number of instances
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
