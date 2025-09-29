@@ -75,7 +75,7 @@ plt.ylabel('Count')
 plt.show()
 
 class LogisticRegression:
-    def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5, verbose=False):
+    def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5, verbose=True):
         self.add_bias = add_bias
         self.learning_rate = learning_rate
         self.epsilon = epsilon
@@ -109,8 +109,8 @@ class LogisticRegression:
             t += 1
 
         if self.verbose:
-            print(f'terminated after {t} iterations, with norm of the gradient equal to {np.linalg.norm(g)}')
-            print(f'the weight found: {self.w}')
+            #print(f'terminated after {t} iterations, with norm of the gradient equal to {np.linalg.norm(g)}')
+            print(f'The weight found: {self.w}')
         return self
 
     def predict(self,x):
@@ -130,14 +130,6 @@ class LogisticRegression:
         grad = np.dot(x.T, yh - y) / N
         return grad
 
-#calculate what % of points are correctly categorized (eg. y_predicted>0.5 vs. y_predicted<0.5)
-def logistic_success_rate(y_predicted, y):
-    N = len(y_predicted)
-    y = np.array(y)
-    yp = y_predicted.round() #round to either 0 or 1 
-    error = abs(yp-y) #if 0 then it was correctly predicted
-    return round((N-error.sum())/N*100, 2)
-
 def test_logistic_regression(x, y, split_percent, learning_rate): 
     train_range = int(len(x) * split_percent / 100)
     
@@ -148,15 +140,22 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     y_test = y.iloc[train_range:]
     
     model = LogisticRegression(learning_rate=learning_rate).fit(X_train, y_train)
-    yh = model.predict(X_test)
-    y = y_test['Diagnosis'].to_numpy()
+    yh_test = model.predict(X_test)
+    yh_train = model.predict(X_train)
+    ny_test = y_test['Diagnosis'].to_numpy()
+    ny_train = y_train['Diagnosis'].to_numpy()
 
-    matching = (yh.round() == y).sum() #Number of correct classifications
+    matching_test = (yh_test.round() == ny_test).sum() #Number of correct classifications
+    matching_train = (yh_train.round() == ny_train).sum()
     test_total = len(y_test)
+    train_total = len(y_train)
     
     # Print results (only test data)
     print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
-    print(f'{matching}/{test_total} correct classifications ({round(matching * 100 / test_total, 2)}% accuracy)')
+    print('Training set performance:')
+    print(f'{matching_train}/{train_total} correct classifications ({round(matching_train * 100 / train_total, 2)}% accuracy)')
+    print('Testing set performance:')
+    print(f'{matching_test}/{test_total} correct classifications ({round(matching_test * 100 / test_total, 2)}% accuracy)')
     
 #run the test using command line arguments
 test_logistic_regression(X, Y, args.split, args.alpha)

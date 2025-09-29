@@ -78,12 +78,15 @@ Y_train = Y.iloc[:train_range]
 Y_predict = Y.iloc[train_range:]
 
 #Fit and Predict
-model = LinearRegression()
-yh = model.fit(X_train,Y_train).predict(X_predict)
+model = LinearRegression().fit(X_train,Y_train)
+yh_train = model.predict(X_train)
+yh_test = model.predict(X_predict)
 
 #Cost Function for prediction
-mse_np = np.mean((Y_predict - yh)**2)
-rmse_np = np.sqrt(mse_np)
+mse_test = np.mean((Y_predict - yh_test)**2)
+rmse_test = np.sqrt(mse_test)
+mse_train = np.mean((Y_train - yh_train)**2)
+rmse_train = np.sqrt(mse_train)
 
 def R2(y,yh):
     y = y.values
@@ -93,13 +96,19 @@ def R2(y,yh):
     return 1 - ss_res / ss_tot
 
 print(f'Results for a {args.split}/{100-args.split} train/test split:')
-print(f"MSE: {mse_np}")
-print(f"RMSE: {rmse_np}")
-print(f"R^2: {R2(Y_predict, yh)}")
+print(f'The weight found: {model.w}')
+print('\nResults for train set:')
+print(f"MSE: {mse_train}")
+print(f"RMSE: {rmse_train}")
+print(f"R^2: {R2(Y_train, yh_train)}")
+print('\nResults for test set:')
+print(f"MSE: {mse_test}")
+print(f"RMSE: {rmse_test}")
+print(f"R^2: {R2(Y_predict, yh_test)}")
 
-plt.plot(Y_predict,yh,'.')
+plt.plot(Y_predict,yh_test,'.')
 plt.plot([Y_predict.min(), Y_predict.max()],[Y_predict.min(), Y_predict.max()], 'r--')
-plt.xlabel('True Values (Y_predict)')
-plt.ylabel('Predicted Values (yh)')
+plt.xlabel('True Values')
+plt.ylabel('Predicted Values')
 plt.title('Predicted vs. True Values')
 plt.show()
