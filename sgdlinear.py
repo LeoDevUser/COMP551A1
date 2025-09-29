@@ -57,13 +57,6 @@ outlier_indices = np.where(z > 3)[0]
 X = X.drop(outlier_indices)
 Y = Y.drop(outlier_indices)
 
-# variable information
-#print(X[X.eq('?').any(axis=1)])
-#print(X.info())
-#print(X.describe())
-#print(Y.info())
-#print(Y.describe())
-
 class LinearRegression:
     def __init__(self, add_bias=True, learning_rate=1., epsilon=1e-4, max_iter=1e5):
         self.add_bias = add_bias

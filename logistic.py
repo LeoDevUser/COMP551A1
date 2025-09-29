@@ -2,10 +2,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
-from ucimlrepo import fetch_ucirepo
 from scipy.special import expit as logistic
 import argparse
-import seaborn as sns
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 from scipy import stats
 
@@ -42,14 +40,9 @@ for i in range(len(features)):
     wdbcHeaders.insert(2*i+3, features[i]+"2") #standard error of the feature
     wdbcHeaders.insert(2*i+4, features[i]+"3") #worst/largest of the feature
 
-# fetch dataset
-#breast_cancer_wisconsin_diagnostic = fetch_ucirepo(id=17)
 breast_cancer_wisconsin_diagnostic = pd.read_csv('wdbc_diagnosis.csv', header=None, names=wdbcHeaders)
 pd.set_option('display.max_columns', None)
 
-# data (as pandas dataframes)
-#X = breast_cancer_wisconsin_diagnostic.data.features
-#Y = breast_cancer_wisconsin_diagnostic.data.targets.copy()
 X = breast_cancer_wisconsin_diagnostic.drop(columns =['Diagnosis', 'ID']) #features
 X = X.drop(X.iloc[:, 10:20], axis=1) #drop standard error features
 Y = breast_cancer_wisconsin_diagnostic[['Diagnosis']].copy() #target
@@ -155,11 +148,9 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     matching = (yh.round() == y).sum() #Number of correct classifications
     test_total = len(y_test)
     
-    # Print results (only test data)
+    #Print results
     print(f'Results for a {split_percent}/{100-split_percent} train/test split with learning rate {args.alpha}:')
     print(f'{matching}/{test_total} correct classifications ({round(matching * 100 / test_total, 2)}% accuracy)')
-    
-    return matching, test_total
 
 #run the test using command line arguments
 test_logistic_regression(X, Y, args.split, args.alpha)

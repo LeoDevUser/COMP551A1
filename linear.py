@@ -3,9 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
-import seaborn as sns
 from scipy import stats
-#from sklearn.preprocessing import StandardScaler
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 
 #parse arguments

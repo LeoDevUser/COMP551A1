@@ -2,16 +2,14 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
-from ucimlrepo import fetch_ucirepo
 from scipy.special import expit as logistic
 import argparse
-import seaborn as sns
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 from scipy import stats
 
-#parse arguments
 batch_size = 0
 
+#parse arguments
 def check_int(value):
     try:
         ivalue = int(value)
@@ -43,14 +41,9 @@ for i in range(len(features)):
     wdbcHeaders.insert(2*i+3, features[i]+"2") #standard error of the feature
     wdbcHeaders.insert(2*i+4, features[i]+"3") #worst/largest of the feature
 
-# fetch dataset
-#breast_cancer_wisconsin_diagnostic = fetch_ucirepo(id=17)
 breast_cancer_wisconsin_diagnostic = pd.read_csv('wdbc_diagnosis.csv', header=None, names=wdbcHeaders)
 pd.set_option('display.max_columns', None)
 
-# data (as pandas dataframes)
-#X = breast_cancer_wisconsin_diagnostic.data.features
-#Y = breast_cancer_wisconsin_diagnostic.data.targets.copy()
 X = breast_cancer_wisconsin_diagnostic.drop(columns =['Diagnosis', 'ID']) #features
 X = X.drop(X.iloc[:, 10:20], axis=1) #drop standard error features
 Y = breast_cancer_wisconsin_diagnostic[['Diagnosis']].copy() #target
@@ -70,9 +63,9 @@ X = X.drop(to_drop, axis=1)
 #drop outliers with z score greater than 3 
 z = np.abs(stats.zscore(X))
 #~0.2% (0.1 above and 0.1 below the mean) of data in a normally distributed dataset will fall in this range
-outlier_indices = np.where(z > 3)[0]
-X = X.drop(outlier_indices)
-Y = Y.drop(outlier_indices)
+outlier_mask = (z>3).any(axis=1)
+X = X[~outlier_mask]
+Y = Y[~outlier_mask]
 
 wdbc_bar = plt.bar(['Benign = 0', 'Malignant = 1'], Y.value_counts(), color=['tab:red', 'tab:blue']) #bar chart of diagnosis
 plt.title('Malignant vs Benign Tumors in the Dataset After Preprocessing')
@@ -165,7 +158,5 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
     print(f'{matching}/{test_total} correct classifications ({round(matching * 100 / test_total, 2)}% accuracy)')
     
-    return matching, test_total
-
 #run the test using command line arguments
 test_logistic_regression(X, Y, args.split, args.alpha)
