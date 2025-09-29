@@ -147,7 +147,7 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     #Scale Features
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_predict = scaler.transform(X_test)
+    X_test = scaler.transform(X_test)
     
     model = LogisticRegression(learning_rate=learning_rate).fit(X_train, y_train)
     yh_test = model.predict(X_test)
@@ -160,7 +160,7 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     test_total = len(y_test)
     train_total = len(y_train)
     
-    # Print results (only test data)
+    #Print results
     print(f'Results for a {args.split}/{100-args.split} train/test split and batch size {batch_size} with learning rate {args.alpha}:')
     print('Training set performance:')
     print(f'{matching_train}/{train_total} correct classifications ({round(matching_train * 100 / train_total, 2)}% accuracy)')

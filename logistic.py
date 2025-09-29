@@ -154,7 +154,7 @@ def test_logistic_regression(x, y, split_percent, learning_rate):
     test_total = len(y_test)
     train_total = len(y_train)
     
-    # Print results (only test data)
+    # Print results
     print(f'Results for a {args.split}/{100-args.split} train/test split with learning rate {args.alpha}:')
     print('Training set performance:')
     print(f'{matching_train}/{train_total} correct classifications ({round(matching_train * 100 / train_total, 2)}% accuracy)')
