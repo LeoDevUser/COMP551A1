@@ -22,6 +22,7 @@ def check_int(value):
 parser = argparse.ArgumentParser(usage='linear.py [--split] [values]')
 #add args
 parser.add_argument('--split', type=check_int, help='Represents the fraction used as the training set', default=80)
+parser.add_argument('--true', action='store_true', help='When set drops total_UPDRS from the features', default=False)
 args = parser.parse_args()
 if args.split == 100:
     args.split = 99
@@ -32,6 +33,8 @@ pd.set_option('display.max_columns', None)
 
 # data (as pandas dataframes)
 X = df.drop(columns=['motor_UPDRS', 'subject#']) #Features
+if (args.true):
+    X = X.drop(columns = ['total_UPDRS'])#Drop the target from the features
 Y = df[['motor_UPDRS']] #Target
 
 #get correlation matrix

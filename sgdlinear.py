@@ -26,6 +26,7 @@ parser = argparse.ArgumentParser(usage='sgdlinear.py [--split|--batch|--alpha] [
 parser.add_argument('--split', type=check_int, help='Represents the fraction used as the training set', default=80)
 parser.add_argument('--batch', type=check_int, help='Represents the fraction of the training set that is to be batched', default=50)
 parser.add_argument('--alpha', type=int, help='The learning rate', default=1)
+parser.add_argument('--true', action='store_true', help='When set drops total_UPDRS from the features', default=False)
 args = parser.parse_args()
 if args.split == 100:
     args.split = 99
@@ -39,6 +40,8 @@ pd.set_option('display.max_columns', None)
 
 # data (as pandas dataframes)
 X = df.drop(columns=['motor_UPDRS', 'subject#']) #Features
+if (args.true):
+    X = X.drop(columns=['total_UPDRS'])
 Y = df[['motor_UPDRS']] #Target
 
 #get correlation matrix
