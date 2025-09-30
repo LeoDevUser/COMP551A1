@@ -21,7 +21,7 @@ def check_int(value):
     
     return ivalue
 #create parser
-parser = argparse.ArgumentParser(usage='sgdlinear.py [--split|--batch|--alpha] [values]')
+parser = argparse.ArgumentParser(usage='sgdlinear.py [--split|--batch|--alpha|--true] [values]')
 #add args
 parser.add_argument('--split', type=check_int, help='Represents the fraction used as the training set', default=80)
 parser.add_argument('--batch', type=check_int, help='Represents the fraction of the training set that is to be batched', default=50)

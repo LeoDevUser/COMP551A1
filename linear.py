@@ -19,7 +19,7 @@ def check_int(value):
 
     return ivalue
 #create parser
-parser = argparse.ArgumentParser(usage='linear.py [--split] [values]')
+parser = argparse.ArgumentParser(usage='linear.py [--split|--true] [value]')
 #add args
 parser.add_argument('--split', type=check_int, help='Represents the fraction used as the training set', default=80)
 parser.add_argument('--true', action='store_true', help='When set drops total_UPDRS from the features', default=False)
