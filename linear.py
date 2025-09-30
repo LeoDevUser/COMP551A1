@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 from scipy import stats
+import statistics
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 
 #parse arguments
@@ -75,7 +78,7 @@ class LinearRegression:
         return yh
 
 #Split Data
-train_range = int(args.split / 100 * 5875) #5875 is the number of instances
+train_range = int(args.split / 100 * len(X)) #5875 is the number of instances
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]

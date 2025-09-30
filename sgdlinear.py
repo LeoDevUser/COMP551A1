@@ -102,12 +102,12 @@ class LinearRegression:
 
     def gradient(self,x,y):
         N = x.shape[0]
-        yh = np.dot(x,self.w)
-        grad = np.dot(x.T,(yh - y)) / N
+        yh = x@self.w
+        grad = 0.5*np.dot(x.T,(yh - y)) / N
         return grad
 
 #Split Data
-train_range = int(args.split / 100 * 5875) #5875 is the number of instances
+train_range = int(args.split / 100 * len(X)) #5875 is the number of instances
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
