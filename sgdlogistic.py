@@ -7,6 +7,7 @@ import argparse
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
+import time
 
 batch_size = 0
 
@@ -84,6 +85,7 @@ class LogisticRegression:
         self.verbose = verbose
 
     def fit(self,x,y):
+        start = time.time() #start timer
         #Convert to numpy arrays if necessary
         if hasattr(x, 'values'):
             x = x.values
@@ -108,9 +110,11 @@ class LogisticRegression:
             g = self.gradient(X_batch,Y_batch)
             self.w = self.w - self.learning_rate /t * g
             t += 1
+        training_time = time.time() - start #end timer
+        epochs = (t - 1) * batch_size / N
 
         if self.verbose:
-            print(f'\nTerminated after {t-1} iterations')
+            print(f'\nTerminated after {t-1} iterations ({epochs:.2f} epochs) in {training_time:.2f} seconds')
             print(f'Feature names and their corresponding weights:')
             for i, col in enumerate(X.columns):
                 print(f"{col}: {self.w[i]}")

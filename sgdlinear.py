@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import argparse
 from scipy import stats
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
+import time
 
 batch_size = 0#init batch size
 
@@ -69,6 +70,7 @@ class LinearRegression:
         pass
 
     def fit(self,x,y):
+        start = time.time()
         if hasattr(y,'values'):
             y = y.values.flatten()
         if x.ndim == 1:
@@ -91,7 +93,9 @@ class LinearRegression:
             g = self.gradient(X_batch,Y_batch)
             self.w = self.w - self.learning_rate / t * g
             t += 1
-        print(f'Terminated after {t-1} iterations')
+        training_time  = time.time() - start
+        epochs = (t-1) * batch_size / N
+        print(f'\nTerminated after {t-1} iterations ({epochs:.2f} epochs) in {training_time:.2f} seconds')
         return self
 
     def predict(self,x):
