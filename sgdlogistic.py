@@ -101,7 +101,7 @@ class LogisticRegression:
         global batch_size
         batch_size = int(args.batch * N / 100)
         #gradient descent
-        while np.linalg.norm(g) > self.epsilon and t < self.max_iter:
+        while np.linalg.norm(g) > self.epsilon and t <= self.max_iter:
             random_indices = np.random.choice(N,size=batch_size,replace=False)
             X_batch = x[random_indices]
             Y_batch = y[random_indices]
@@ -110,8 +110,8 @@ class LogisticRegression:
             t += 1
 
         if self.verbose:
-            #print(f'terminated after {t} iterations, with norm of the gradient equal to {np.linalg.norm(g)}')
-            print(f'\nFeature names and their corresponding weights:')
+            print(f'\nTerminated after {t-1} iterations')
+            print(f'Feature names and their corresponding weights:')
             for i, col in enumerate(X.columns):
                 print(f"{col}: {self.w[i]}")
             print('\n')

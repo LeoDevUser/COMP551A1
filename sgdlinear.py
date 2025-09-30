@@ -91,6 +91,7 @@ class LinearRegression:
             g = self.gradient(X_batch,Y_batch)
             self.w = self.w - self.learning_rate / t * g
             t += 1
+        print(f'Terminated after {t-1} iterations')
         return self
 
     def predict(self,x):
@@ -107,7 +108,7 @@ class LinearRegression:
         return grad
 
 #Split Data
-train_range = int(args.split / 100 * len(X)) #5875 is the number of instances
+train_range = int(args.split / 100 * len(X))
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]

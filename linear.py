@@ -4,10 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 from scipy import stats
-import statistics
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
 matplotlib.use('Qt5Agg') #Set GUI backend for plots
 
 #parse arguments
@@ -39,6 +36,7 @@ X = df.drop(columns=['motor_UPDRS', 'subject#']) #Features
 if (args.true):
     X = X.drop(columns = ['total_UPDRS'])#Drop the target from the features
 Y = df[['motor_UPDRS']] #Target
+print(Y.std())
 
 #get correlation matrix
 corr = abs(X.corr())
@@ -78,7 +76,7 @@ class LinearRegression:
         return yh
 
 #Split Data
-train_range = int(args.split / 100 * len(X)) #5875 is the number of instances
+train_range = int(args.split / 100 * len(X))
 X_train = X.iloc[:train_range]
 X_predict = X.iloc[train_range:]
 Y_train = Y.iloc[:train_range]
