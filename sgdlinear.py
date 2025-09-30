@@ -99,8 +99,8 @@ class LinearRegression:
 
     def gradient(self,x,y):
         N = x.shape[0]
-        yh = np.dot(x,self.w)
-        grad = np.dot(x.T,(yh - y)) / N
+        yh = x@self.w
+        grad = 0.5*np.dot(x.T,(yh - y)) / N
         return grad
 
 #Split Data
