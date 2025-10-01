@@ -14,3 +14,5 @@ options:
   --split SPLIT  represents the fraction used as the training set
   --alpha ALPHA  The learning rate
   --batch BATCH  Represents the fraction of the training set that is to be batched
+
+for the .ipynb to run, they must be able to access the .csv files
